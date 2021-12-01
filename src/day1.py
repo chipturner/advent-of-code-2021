@@ -1,4 +1,5 @@
 import itertools
+import more_itertools
 import collections
 import fileinput
 
@@ -8,9 +9,8 @@ def main() -> None:
         line = line.strip()
         vals.append(int(line.strip()))
     print(vals)
-    sums = []
-    for idx in range(len(vals) - 2):
-        sums.append(sum(vals[idx:idx+3]))
-    print("\n".join(str(s) for s in sums))
+    sums = [ sum(v) for v in more_itertools.windowed(vals, 1) ]
+    incs = sum(v0 < v1 for (v0, v1) in zip(sums[:-1], sums[1:]))
+    print(incs)
 
 main()
