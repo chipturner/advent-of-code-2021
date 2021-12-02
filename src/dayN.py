@@ -3,8 +3,7 @@ import collections
 import fileinput
 
 def main() -> None:
-    for line in fileinput.input():
-        line = line.strip()
-        print(line)
+    lines = list(l.strip() for l in fileinput.input())
+    print(lines)
 
 main()
