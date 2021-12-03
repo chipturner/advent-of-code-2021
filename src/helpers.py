@@ -2,7 +2,8 @@
 
 import fileinput
 
-from typing import List, Tuple
+from typing import List, Tuple, Any
+import numpy
 
 def read_input() -> List[str]:
     return list(l.strip() for l in fileinput.input())
@@ -17,3 +18,7 @@ def read_input_numbers(sep: str = ',') -> List[int]:
     l = read_input()
     assert len(l) == 1
     return [int(s) for s in l[0].split(sep)]
+
+def read_input_matrix() -> Any:
+    lines = read_input()
+    return numpy.matrix(data=[ [int(n) for n in l ] for l in lines ])
