@@ -1,16 +1,16 @@
+import helpers
+
 import itertools
 import collections
-import fileinput
-
 
 def main() -> None:
     z, x, aim = 0, 0, 0
-    for line in fileinput.input():
-        line = line.strip().split()
-        n = int(line[1])
-        if line[0] == 'up':
+    lines = helpers.read_input_split(' ', 2)
+    for cmd, v in lines:
+        n = int(v)
+        if cmd == 'up':
             aim -= n
-        elif line[0] == 'down':
+        elif cmd == 'down':
             aim += n
         else:
             x += n

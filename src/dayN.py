@@ -1,9 +1,10 @@
+import helpers
+
 import itertools
 import collections
-import fileinput
 
 def main() -> None:
-    lines = list(l.strip() for l in fileinput.input())
+    lines = helpers.read_input()
     print(lines)
 
 main()
