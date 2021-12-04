@@ -12,8 +12,8 @@ def read_input() -> List[str]:
 def read_input_split(sep: str = ' ', nsplit: int = 1) -> List[List[str]]:
     return [l.strip().split(sep, nsplit) for l in read_input()]
 
-def read_input_grid() -> List[List[str]]:
-    return list(list(l) for l in read_input())
+def read_input_grid() -> numpy.typing.NDArray[numpy.str_]:
+    return numpy.array(list(list(l) for l in read_input()))
 
 def read_input_numbers(sep: str = ',') -> List[int]:
     l = read_input()
