@@ -4,6 +4,7 @@ import fileinput
 
 from typing import List, Tuple, Any
 import numpy
+import numpy.typing
 
 def read_input() -> List[str]:
     return list(l.strip() for l in fileinput.input())
@@ -22,3 +23,7 @@ def read_input_numbers(sep: str = ',') -> List[int]:
 def read_input_matrix() -> Any:
     lines = read_input()
     return numpy.array([ [int(n) for n in l ] for l in lines ])
+
+def most_common_byte(r: numpy.typing.NDArray[numpy.int_]) -> int:
+    return int(numpy.sum(r == 1) >= numpy.sum(r == 0))
+
