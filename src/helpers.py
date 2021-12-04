@@ -21,4 +21,4 @@ def read_input_numbers(sep: str = ',') -> List[int]:
 
 def read_input_matrix() -> Any:
     lines = read_input()
-    return numpy.matrix(data=[ [int(n) for n in l ] for l in lines ])
+    return numpy.array([ [int(n) for n in l ] for l in lines ])
