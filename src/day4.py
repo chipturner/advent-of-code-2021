@@ -4,6 +4,7 @@ import numpy
 import itertools
 import collections
 
+
 def card_wins(card):
     d = numpy.array(card)
     dt = d.transpose()
@@ -15,9 +16,10 @@ def card_wins(card):
             return True
     return False
 
+
 def main() -> None:
     lines = helpers.read_input()
-    numbers = [int(v) for v in lines[0].split(',')]
+    numbers = [int(v) for v in lines[0].split(",")]
 
     cards = []
     cur_card = []
@@ -40,7 +42,7 @@ def main() -> None:
             for i in range(len(card)):
                 for j in range(len(card[0])):
                     if card[i][j] == num:
-                        card[i][j] = 0;
+                        card[i][j] = 0
             if card_wins(card):
                 print(num)
                 s = sum(sum(r) for r in card)
@@ -48,5 +50,6 @@ def main() -> None:
                 print(card)
                 print(num * s)
                 winners[idx] = 1
+
 
 main()

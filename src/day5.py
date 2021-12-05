@@ -4,13 +4,14 @@ import itertools
 import collections
 from typing import DefaultDict
 
+
 def main() -> None:
     lines = helpers.read_input()
     hits: DefaultDict[helpers.Point, int] = collections.defaultdict(int)
     for line in lines:
-        p1, p2 = map(helpers.Point.from_str, line.split(' -> '))
+        p1, p2 = map(helpers.Point.from_str, line.split(" -> "))
         delta = (helpers.cmp(p2.x, p1.x), helpers.cmp(p2.y, p1.y))
-        print('delta', delta)
+        print("delta", delta)
 
         pos = p1
         while pos != p2:
@@ -24,5 +25,6 @@ def main() -> None:
         if v > 1:
             c += 1
     print(c)
+
 
 main()

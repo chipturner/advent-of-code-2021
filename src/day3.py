@@ -4,6 +4,7 @@ import helpers
 import itertools
 import collections
 
+
 def main() -> None:
     orig_data = helpers.read_input_matrix()
     data = orig_data.copy()
@@ -14,7 +15,7 @@ def main() -> None:
         if len(data) == 1:
             break
 
-    v1 = int(''.join(map(str, data.flatten().tolist())), 2)
+    v1 = int("".join(map(str, data.flatten().tolist())), 2)
 
     data = orig_data.copy()
     for i in range(len(data[0])):
@@ -23,7 +24,8 @@ def main() -> None:
         data = numpy.array([r for r in data if r[i] == m])
         if len(data) == 1:
             break
-    v2 = int(''.join(map(str, data.flatten().tolist())), 2)
+    v2 = int("".join(map(str, data.flatten().tolist())), 2)
     print(v1 * v2)
+
 
 main()
