@@ -5,7 +5,8 @@ from __future__ import annotations
 import fileinput
 from dataclasses import dataclass
 
-from typing import List, Tuple, Any, Dict
+from typing import List, Tuple, Any, Dict, Sequence, TypeVar
+import numbers
 import numpy
 import numpy.typing
 
@@ -30,6 +31,10 @@ def read_input_matrix() -> Any:
 def most_common_byte(r: numpy.typing.NDArray[numpy.int_]) -> int:
     return int(numpy.sum(r == 1) >= numpy.sum(r == 0))
 
+# Goofy replacement since cmp was removed in python3 (!)
+def cmp(a: int, b: int) -> int:
+    return (a > b) - (a < b)
+
 @dataclass(frozen=True)
 class Point:
     x: int
@@ -39,8 +44,9 @@ class Point:
     def from_str(s: str) -> Point:
         return Point(*map(int, s.split(',')))
 
-    def __add__(self, other: Point) -> Point:
-        return Point(self.x + other.x, self.y + other.y)
+    def __add__(self, other: Tuple[int, int]) -> Point:
+        x, y = other
+        return Point(self.x + x, self.y + y)
 
 def print_grid(g: Dict[Point, Any]) -> None:
     min_i = min(p.x for p in g.keys())

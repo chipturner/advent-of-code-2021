@@ -2,23 +2,14 @@ import helpers
 
 import itertools
 import collections
+from typing import DefaultDict
 
 def main() -> None:
     lines = helpers.read_input()
-    hits = collections.defaultdict(int)
+    hits: DefaultDict[helpers.Point, int] = collections.defaultdict(int)
     for line in lines:
         p1, p2 = map(helpers.Point.from_str, line.split(' -> '))
-        delta = [0, 0]
-        print('seq  ', p1, p2)
-        if p1.x < p2.x:
-            delta[0] = 1
-        elif p1.x > p2.x:
-            delta[0] = -1
-        if p1.y < p2.y:
-            delta[1] = 1
-        elif p1.y > p2.y:
-            delta[1] = -1
-        delta = helpers.Point(*delta)
+        delta = (helpers.cmp(p2.x, p1.x), helpers.cmp(p2.y, p1.y))
         print('delta', delta)
 
         pos = p1
