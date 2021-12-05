@@ -1,8 +1,11 @@
 #!usr/bin/python3.9
 
-import fileinput
+from __future__ import annotations
 
-from typing import List, Tuple, Any
+import fileinput
+from dataclasses import dataclass
+
+from typing import List, Tuple, Any, Dict
 import numpy
 import numpy.typing
 
@@ -27,3 +30,24 @@ def read_input_matrix() -> Any:
 def most_common_byte(r: numpy.typing.NDArray[numpy.int_]) -> int:
     return int(numpy.sum(r == 1) >= numpy.sum(r == 0))
 
+@dataclass(frozen=True)
+class Point:
+    x: int
+    y: int
+
+    @staticmethod
+    def from_str(s: str) -> Point:
+        return Point(*map(int, s.split(',')))
+
+    def __add__(self, other: Point) -> Point:
+        return Point(self.x + other.x, self.y + other.y)
+
+def print_grid(g: Dict[Point, Any]) -> None:
+    min_i = min(p.x for p in g.keys())
+    max_i = max(p.x for p in g.keys())
+    min_j = min(p.y for p in g.keys())
+    max_j = max(p.y for p in g.keys())
+    for j in range(min_i, max_i + 1):
+        for i in range(min_j, max_j + 1):
+            print(g[Point(i, j)] or '.', end='')
+        print()
