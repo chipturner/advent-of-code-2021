@@ -10,6 +10,8 @@ import numbers
 import numpy
 import numpy.typing
 
+import PIL.Image, PIL.ImageDraw
+
 
 def read_input() -> List[str]:
     return list(l.strip() for l in fileinput.input())
@@ -66,3 +68,28 @@ def print_grid(g: Dict[Point, Any]) -> None:
         for i in range(min_j, max_j + 1):
             print(g[Point(i, j)] or ".", end="")
         print()
+
+
+def write_grid(grid: Dict[Point, int], path: str) -> None:
+    img_size = 3000
+    min_i = min(p.x for p in grid.keys())
+    max_i = max(p.x for p in grid.keys())
+    min_j = min(p.y for p in grid.keys())
+    max_j = max(p.y for p in grid.keys())
+    x_range, y_range = max_i - min_i, max_j - min_j
+    square_range = max(x_range, y_range)
+    scale = img_size / square_range
+    max_fill = max(grid.values())
+
+    img = PIL.Image.new("RGB", (img_size, img_size))
+    draw = PIL.ImageDraw.Draw(img)
+    for pt, count in grid.items():
+        r, g, b = (count * int(255 / max_fill),) * 3
+        if count == max_fill:
+            print(pt, count, r)
+            (r, g, b) = (255, 0, 0)
+        draw.rectangle(
+            (scale * pt.x, scale * pt.y, scale * (pt.x + 1), scale * (pt.y + 1)),
+            fill=(r, g, b),
+        )
+    img.save(path)
