@@ -17,16 +17,19 @@ def is_match(grid: helpers.NumericGrid, i: int, j: int) -> bool:
 
 
 def valley_size(grid: helpers.NumericGrid, i: int, j: int) -> int:
-    if grid[i, j] >= 9:
-        return 0
-    grid[i, j] = 10
-    for x, y in helpers.neighbors(grid, i, j):
-        try:
-            if grid[x, y] < 9:
-                valley_size(grid, x, y)
-        except IndexError:
-            pass
-    return int(numpy.sum(grid == 10))
+    seen = set()
+    todo = [(i, j)]
+
+    size = 0
+    while todo:
+        p = todo.pop(0)
+        if p in seen or grid[p] == 9:
+            continue
+        size += 1
+        seen.add(p)
+        for neighbor in helpers.neighbors(grid, *p):
+            todo.append(neighbor)
+    return size
 
 
 def main() -> None:
@@ -41,7 +44,7 @@ def main() -> None:
 
     vals = []
     for i, j in valleys:
-        vals.append(valley_size(grid.copy(), i, j))
+        vals.append(valley_size(grid, i, j))
     vals = sorted(vals)[-3:]
     print(vals[0] * vals[1] * vals[2])
 

@@ -25,18 +25,15 @@ T = TypeVar("T", bound=numpy.generic)
 
 
 def read_input_grid(conv: Callable[[str], T]) -> numpy.typing.NDArray[T]:
-    return numpy.array(list(list(conv(i) for i in l) for l in read_input()))
+    ret = numpy.array(list(list(conv(i) for i in l) for l in read_input()))
+    ret.setflags(write=False)
+    return ret
 
 
 def read_input_numbers(sep: str = ",") -> List[int]:
     l = read_input()
     assert len(l) == 1
     return [int(s) for s in l[0].split(sep)]
-
-
-def read_input_matrix() -> Any:
-    lines = read_input()
-    return numpy.array([[int(n) for n in l] for l in lines])
 
 
 NumericGrid = numpy.typing.NDArray[numpy.int_]
