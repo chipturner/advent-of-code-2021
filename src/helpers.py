@@ -5,7 +5,7 @@ from __future__ import annotations
 import fileinput
 from dataclasses import dataclass
 
-from typing import List, Tuple, Any, Dict, Sequence, TypeVar
+from typing import List, Tuple, Any, Dict, Sequence, TypeVar, Callable, Iterable
 import numbers
 import numpy
 import numpy.typing
@@ -21,11 +21,11 @@ def read_input_split(sep: str = " ", nsplit: int = 1) -> List[List[str]]:
     return [l.strip().split(sep, nsplit) for l in read_input()]
 
 
-def read_input_grid() -> numpy.typing.NDArray[numpy.str_]:
-    return numpy.array(list(list(l) for l in read_input()))
+T = TypeVar("T", bound=numpy.generic)
 
-def read_input_grid_int() -> numpy.typing.NDArray[numpy.int_]:
-    return numpy.array(list(list(int(i) for i in l) for l in read_input()))
+
+def read_input_grid(conv: Callable[[str], T]) -> numpy.typing.NDArray[T]:
+    return numpy.array(list(list(conv(i) for i in l) for l in read_input()))
 
 
 def read_input_numbers(sep: str = ",") -> List[int]:
@@ -39,8 +39,19 @@ def read_input_matrix() -> Any:
     return numpy.array([[int(n) for n in l] for l in lines])
 
 
-def most_common_byte(r: numpy.typing.NDArray[numpy.int_]) -> int:
+NumericGrid = numpy.typing.NDArray[numpy.int_]
+
+
+def most_common_byte(r: NumericGrid) -> int:
     return int(numpy.sum(r == 1) >= numpy.sum(r == 0))
+
+
+def neighbors(grid: NumericGrid, i: int, j: int) -> Iterable[Tuple[int, int]]:
+    h, w = grid.shape
+    for pos in ((i, j + 1), (i, j - 1), (i + 1, j), (i - 1, j)):
+        if pos[0] < 0 or pos[1] < 0 or pos[0] >= h or pos[1] >= w:
+            continue
+        yield pos
 
 
 # Goofy replacement since cmp was removed in python3 (!)
