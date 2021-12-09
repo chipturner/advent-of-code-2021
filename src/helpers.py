@@ -13,23 +13,26 @@ import numpy.typing
 import PIL.Image, PIL.ImageDraw
 
 
+# list of lines
 def read_input() -> List[str]:
     return list(l.strip() for l in fileinput.input())
 
 
+# list of lists of lines split by delimiter
 def read_input_split(sep: str = " ", nsplit: int = 1) -> List[List[str]]:
     return [l.strip().split(sep, nsplit) for l in read_input()]
 
 
 T = TypeVar("T", bound=numpy.generic)
 
-
-def read_input_grid(conv: Callable[[str], T]) -> numpy.typing.NDArray[T]:
+# grid of densly packed digits like '12139' etc
+def read_input_digit_grid(conv: Callable[[str], T]) -> numpy.typing.NDArray[T]:
     ret = numpy.array(list(list(conv(i) for i in l) for l in read_input()))
     ret.setflags(write=False)
     return ret
 
 
+# single line of separated numbers
 def read_input_numbers(sep: str = ",") -> List[int]:
     l = read_input()
     assert len(l) == 1

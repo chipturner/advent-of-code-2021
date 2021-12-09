@@ -33,7 +33,7 @@ def valley_size(grid: helpers.NumericGrid, i: int, j: int) -> int:
 
 
 def main() -> None:
-    grid = helpers.read_input_grid(numpy.int_)
+    grid = helpers.read_input_digit_grid(numpy.int_)
     w, h = grid.shape
 
     valleys = []

@@ -6,7 +6,7 @@ import collections
 
 
 def main() -> None:
-    orig_data = helpers.read_input_grid(numpy.int_)
+    orig_data = helpers.read_input_digit_grid(numpy.int_)
     data = orig_data.copy()
     for i in range(len(data[0])):
         transposed = data.transpose()
