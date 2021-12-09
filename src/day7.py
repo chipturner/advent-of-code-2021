@@ -4,7 +4,7 @@ import math
 import itertools
 import collections
 
-def cost(d):
+def cost(d: int) -> int:
     d = abs(d)
     return d * (d + 1) // 2
 

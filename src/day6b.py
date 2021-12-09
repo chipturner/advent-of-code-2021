@@ -11,7 +11,7 @@ class Fish:
     span: int
 
 @functools.cache
-def new_fish_in_days(days):
+def new_fish_in_days(days: int) -> int:
     ret = 0
     for i in range(days):
         if i % 7 == 0:
