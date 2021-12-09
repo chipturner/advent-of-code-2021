@@ -24,6 +24,9 @@ def read_input_split(sep: str = " ", nsplit: int = 1) -> List[List[str]]:
 def read_input_grid() -> numpy.typing.NDArray[numpy.str_]:
     return numpy.array(list(list(l) for l in read_input()))
 
+def read_input_grid_int() -> numpy.typing.NDArray[numpy.int_]:
+    return numpy.array(list(list(int(i) for i in l) for l in read_input()))
+
 
 def read_input_numbers(sep: str = ",") -> List[int]:
     l = read_input()
