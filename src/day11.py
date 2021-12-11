@@ -5,6 +5,7 @@ import helpers
 import itertools
 import collections
 
+
 def flash(grid, flash_points, i, j):
     for n in helpers.neighbors8(grid, i, j):
         grid[n] += 1
@@ -22,7 +23,7 @@ def main() -> None:
     h, w = grid.shape
 
     total_flashes = 0
-    for _ in range(100):
+    for _ in range(1000):
         flash_points = numpy.zeros((h, w), dtype=bool)
         grid += 1
         for i in range(h):
@@ -32,8 +33,14 @@ def main() -> None:
                     flash_points[i, j] = True
                     flash(grid, flash_points, i, j)
 
-        grid *= (1 - flash_points)
-        total_flashes += numpy.sum(flash_points)
+        grid *= 1 - flash_points
+        c = numpy.sum(flash_points)
+        print("step", _ + 1)
+        if c == h * w:
+            print("boom", c)
+        total_flashes += c
         print(grid)
     print(total_flashes)
+
+
 main()
