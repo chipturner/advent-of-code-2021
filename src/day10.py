@@ -3,9 +3,10 @@ import helpers
 import itertools
 import collections
 
-chunks = {'(': ')', '[': ']', '{': '}', '<': '>'}
-scores = {')': 3, ']': 57, '}': 1197, '>': 25137}
-close_scores = dict(zip(')]}>', range(1, 5)))
+chunks = {"(": ")", "[": "]", "{": "}", "<": ">"}
+scores = {")": 3, "]": 57, "}": 1197, ">": 25137}
+close_scores = dict(zip(")]}>", range(1, 5)))
+
 
 def main() -> None:
     lines = helpers.read_input()
@@ -33,5 +34,7 @@ def main() -> None:
                 score *= 5
                 score += close_scores[chunks[ch]]
             score2s.append(score)
-    print(sorted(score2s)[len(score2s)//2])
+    print(sorted(score2s)[len(score2s) // 2])
+
+
 main()
