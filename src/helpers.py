@@ -53,6 +53,14 @@ def neighbors(grid: NumericGrid, i: int, j: int) -> Iterable[Tuple[int, int]]:
             continue
         yield pos
 
+def neighbors8(grid: NumericGrid, i: int, j: int) -> Iterable[Tuple[int, int]]:
+    h, w = grid.shape
+    for pos in ((i, j + 1), (i, j - 1), (i + 1, j), (i - 1, j),
+                (i+1, j + 1), (i-1, j - 1), (i + 1, j-1), (i - 1, j+1)):
+        if pos[0] < 0 or pos[1] < 0 or pos[0] >= h or pos[1] >= w:
+            continue
+        yield pos
+
 
 # Goofy replacement since cmp was removed in python3 (!)
 def cmp(a: int, b: int) -> int:
