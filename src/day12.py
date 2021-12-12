@@ -3,16 +3,30 @@ import helpers
 import itertools
 import collections
 
-def visit(edges, forbidden, path):
-    if path[-1] == 'end':
-        return [ path ]
+def can_visit(path, e):
+    if e == 'start':
+        return False
+    if e.upper() == e:
+        return True
+    if e not in path:
+        return True
+
+    lowers = set()
+    for p in path:
+        if p.lower() == p:
+            if p in lowers:
+                return False
+        lowers.add(p)
+
+    return True
+
+def visit(edges, path):
     ret = [ ]
     for e in edges[path[-1]]:
-        if e not in forbidden:
-            if e.lower() == e:
-                ret.extend(visit(edges, forbidden.union({e}), path + [ e ]))
-            else:
-                ret.extend(visit(edges, forbidden, path + [ e ]))
+        if e == 'end':
+            ret.append(path + [ e ])
+        elif can_visit(path, e):
+            ret.extend(visit(edges, path + [ e ]))
     return ret
 
 def main() -> None:
@@ -22,14 +36,14 @@ def main() -> None:
         e = line.split('-')
         edges[e[0]].add(e[1])
         edges[e[1]].add(e[0])
-    print(edges)
 
     paths = set()
     seen = set()
     todo = [ 'start' ]
         
-    v = visit(edges, {'start'}, ['start'])
+    v = visit(edges, ['start'])
+    for p in v:
+        print(*p, sep=',')
     print(len(v))
-    print(v)
 
 main()
