@@ -86,9 +86,9 @@ def print_grid(g: Dict[Point, Any]) -> None:
     max_i = max(p.x for p in g.keys())
     min_j = min(p.y for p in g.keys())
     max_j = max(p.y for p in g.keys())
-    for j in range(min_i, max_i + 1):
-        for i in range(min_j, max_j + 1):
-            print(g[Point(i, j)] or ".", end="")
+    for j in range(min_j, max_j + 1):
+        for i in range(min_i, max_i + 1):
+            print(g.get(Point(i, j), '.'), end="")
         print()
 
 
