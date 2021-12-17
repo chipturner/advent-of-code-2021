@@ -3,12 +3,24 @@
 from __future__ import annotations
 
 from enum import Enum
+import io
 import functools
 import fileinput
 import operator
 from dataclasses import dataclass
 
-from typing import List, Tuple, Any, Dict, Sequence, TypeVar, Callable, Iterable, Optional
+from typing import (
+    List,
+    Tuple,
+    Any,
+    Dict,
+    Sequence,
+    TypeVar,
+    Callable,
+    Iterable,
+    Optional,
+    IO,
+)
 import numbers
 import numpy
 import numpy.typing
@@ -56,10 +68,19 @@ def neighbors(grid: NumericGrid, i: int, j: int) -> Iterable[Tuple[int, int]]:
             continue
         yield pos
 
+
 def neighbors8(grid: NumericGrid, i: int, j: int) -> Iterable[Tuple[int, int]]:
     h, w = grid.shape
-    for pos in ((i, j + 1), (i, j - 1), (i + 1, j), (i - 1, j),
-                (i+1, j + 1), (i-1, j - 1), (i + 1, j-1), (i - 1, j+1)):
+    for pos in (
+        (i, j + 1),
+        (i, j - 1),
+        (i + 1, j),
+        (i - 1, j),
+        (i + 1, j + 1),
+        (i - 1, j - 1),
+        (i + 1, j - 1),
+        (i - 1, j + 1),
+    ):
         if pos[0] < 0 or pos[1] < 0 or pos[0] >= h or pos[1] >= w:
             continue
         yield pos
@@ -91,7 +112,7 @@ def print_grid(g: Dict[Point, Any]) -> None:
     max_j = max(p.y for p in g.keys())
     for j in range(min_j, max_j + 1):
         for i in range(min_i, max_i + 1):
-            print(g.get(Point(i, j), '.'), end="")
+            print(g.get(Point(i, j), "."), end="")
         print()
 
 
@@ -119,6 +140,7 @@ def write_grid(grid: Dict[Point, int], path: str) -> None:
         )
     img.save(path)
 
+
 class BitsOperator(Enum):
     SUM = 0
     PRODUCT = 1
@@ -129,18 +151,29 @@ class BitsOperator(Enum):
     LT = 6
     EQ = 7
 
+
 def prod(args):
     return functools.reduce(operator.mul, args)
+
+
 def eq(args):
     return functools.reduce(operator.eq, args)
+
+
 def lt(args):
     return functools.reduce(operator.lt, args)
+
+
 def gt(args):
     return functools.reduce(operator.gt, args)
+
+
 def fail(args):
     return 0
 
-opmap: List[Callable[[List[int]], int]] = [ sum, prod, min, max, fail, gt, lt, eq]
+
+opmap: List[Callable[[List[int]], int]] = [sum, prod, min, max, fail, gt, lt, eq]
+
 
 @dataclass
 class BitsPacket:
@@ -148,27 +181,70 @@ class BitsPacket:
     type_id: BitsOperator
     children: List[BitsPacket]
     literal_value: Optional[int]
-    operator: Optional[BitsOperator]
 
     def __init__(self, version: int, type_id: int):
         self.version = version
         self.type_id = BitsOperator(type_id)
         self.children = []
         self.literal_value = None
-        self.operator = None
 
     def eval(self) -> int:
         if self.type_id == BitsOperator.LITERAL:
             assert self.literal_value is not None
             return self.literal_value
         else:
-            results = [ c.eval() for c in self.children ]
+            results = [c.eval() for c in self.children]
             return opmap[self.type_id.value](results)
 
-    def print(self, indent='') -> None:
+    def print(self, indent="") -> None:
         if self.type_id == BitsOperator.LITERAL:
-            print(f"{indent}BitsPacket(ver={self.version}, type-{self.type_id}, val={self.literal_value})")
+            print(
+                f"{indent}BitsPacket(ver={self.version}, type-{self.type_id}, val={self.literal_value})"
+            )
         else:
             print(f"{indent}BitsPacket(ver={self.version}, type-{self.type_id})")
             for c in self.children:
-                c.print(indent + '  ')
+                c.print(indent + "  ")
+
+
+def decode_packet(p: IO) -> BitsPacket:
+    ver, type_id = int(p.read(3), 2), int(p.read(3), 2)
+    print("decode ver", ver, "type", type_id, p)
+
+    packet = BitsPacket(ver, type_id)
+
+    sub_value = None
+    if type_id == 4:
+        s = ""
+        while p.read(1) != "0":
+            nib = p.read(4)
+            s += nib
+        s += p.read(4)
+        literal = int(s, 2)
+        print("literal", s, literal)
+        sub_value = literal
+        packet.literal_value = literal
+    else:
+        length_type_id = p.read(1)
+        print(type_id)
+        print("op is", type_id)
+        if length_type_id == "0":
+            nib = p.read(15)
+            total_length = int(nib, 2)
+            print("subpacket length", total_length)
+            p = io.StringIO(p.read(total_length))
+            acc = []
+            while p.tell() < total_length:
+                val = decode_packet(p)
+                acc.append(val)
+            packet.children = acc
+        else:
+            nib = p.read(11)
+            num_subs = int(nib, 2)
+            print("subpacket group", num_subs)
+            acc = []
+            for i in range(num_subs):
+                val = decode_packet(p)
+                acc.append(val)
+            packet.children = acc
+    return packet
