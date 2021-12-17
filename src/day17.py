@@ -45,29 +45,29 @@ def max_ypos(step, yv, min_y, max_y):
 def main() -> None:
     # s = 'target area: x=20..30, y=-10..-5'
     # s = 'target area: x=143..177, y=-106..-71'
-    min_x, max_x = 20, 30
-    min_y, max_y = -10, -5
+
     min_x, max_x = 143, 177
     min_y, max_y = -106, -71
 
-
+    min_x, max_x = 20, 30
+    min_y, max_y = -10, -5
     y_step_hits = collections.defaultdict(set)
-    for yv in range(0, 1000):
+    for yv in range(-5000, 5000):
         for step in y_candidates(yv, min_y, max_y):
             y_step_hits[step].add(yv)
 
     x_step_hits = collections.defaultdict(set)
-    for xv in range(0, max_x + 5):
+    for xv in range(-100, max_x + 100):
         for step in x_candidates(xv, min_x, max_x):
             x_step_hits[step].add(xv)
 
-    candidates = []
+    candidates = set()
     for s, yvs in y_step_hits.items():
         xvs = x_step_hits.get(s, set())
         print(s, xvs, yvs)
         for xv, yv in itertools.product(xvs, yvs):
-            candidates.append(max_ypos(s, yv, min_y, max_y))
+            candidates.add((xv, yv))
     print(candidates)
-
+    print(len(candidates))
 
 main()
