@@ -1,3 +1,4 @@
+import copy
 import functools
 import helpers
 
@@ -165,11 +166,12 @@ def main() -> None:
     fishes = []
     for f_str in lines:
         fishes.append(parse(eval(f_str)))
-    f = fishes.pop(0)
-    while fishes:
-        f = add(f, fishes.pop(0))
-        chain(f)
-    print(f.render())
-    print(magnitude(f))
+
+    for f1, f2 in itertools.permutations(fishes, 2):
+        f1 = copy.deepcopy(f1)
+        f2 = copy.deepcopy(f2)
+        r = add(f1, f2)
+        chain(r)
+        print(magnitude(r))
          
 main()
