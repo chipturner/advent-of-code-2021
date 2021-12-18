@@ -1,8 +1,9 @@
+from typing import Iterable, Tuple
 import itertools
 import collections
 
 
-def sign(n):
+def sign(n: int) -> int:
     if n < 0:
         return -1
     if n > 0:
@@ -10,7 +11,7 @@ def sign(n):
     return 0
 
 
-def trajectory(xv, yv):
+def trajectory(xv: int, yv: int) -> Iterable[Tuple[int, int, int]]:
     x, y = 0, 0
     step = 0
     while True:
@@ -22,11 +23,13 @@ def trajectory(xv, yv):
         yield step, x, y
 
 
-def inside_box(min_x, x, max_x, min_y, y, max_y):
+def inside_box(min_x: int, x: int, max_x: int, min_y: int, y: int, max_y: int) -> bool:
     return (min_x <= x <= max_x) and (min_y <= y <= max_y)
 
 
-def viable(xv, min_x, x, max_x, yv, min_y, y, max_y):
+def viable(
+    xv: int, min_x: int, x: int, max_x: int, yv: int, min_y: int, y: int, max_y: int
+) -> bool:
     if xv == 0 and not (min_x <= x <= max_x):
         return False
     if x > max_x:

@@ -19,7 +19,7 @@ from typing import (
     Callable,
     Iterable,
     Optional,
-    IO,
+    TextIO,
 )
 import numbers
 import numpy
@@ -152,23 +152,23 @@ class BitsOperator(Enum):
     EQ = 7
 
 
-def prod(args):
+def prod(args: List[int]) -> int:
     return functools.reduce(operator.mul, args)
 
 
-def eq(args):
+def eq(args: List[int]) -> int:
     return functools.reduce(operator.eq, args)
 
 
-def lt(args):
+def lt(args: List[int]) -> int:
     return functools.reduce(operator.lt, args)
 
 
-def gt(args):
+def gt(args: List[int]) -> int:
     return functools.reduce(operator.gt, args)
 
 
-def fail(args):
+def fail(args: List[int]) -> int:
     return 0
 
 
@@ -196,7 +196,7 @@ class BitsPacket:
             results = [c.eval() for c in self.children]
             return opmap[self.type_id.value](results)
 
-    def print(self, indent="") -> None:
+    def print(self, indent: str = "") -> None:
         if self.type_id == BitsOperator.LITERAL:
             print(
                 f"{indent}BitsPacket(ver={self.version}, type-{self.type_id}, val={self.literal_value})"
@@ -207,7 +207,7 @@ class BitsPacket:
                 c.print(indent + "  ")
 
 
-def decode_packet(p: IO) -> BitsPacket:
+def decode_packet(p: TextIO) -> BitsPacket:
     ver, type_id = int(p.read(3), 2), int(p.read(3), 2)
     print("decode ver", ver, "type", type_id, p)
 
