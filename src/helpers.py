@@ -22,10 +22,13 @@ from typing import (
     TextIO,
 )
 import numbers
-import numpy
-import numpy.typing
+import platform
 
-import PIL.Image, PIL.ImageDraw
+if platform.python_implementation() == "CPython":
+    import numpy
+    import numpy.typing
+
+    import PIL.Image, PIL.ImageDraw
 
 
 # list of lines
@@ -38,15 +41,6 @@ def read_input_split(sep: str = " ", nsplit: int = 1) -> List[List[str]]:
     return [l.strip().split(sep, nsplit) for l in read_input()]
 
 
-T = TypeVar("T", bound=numpy.generic)
-
-# grid of densly packed digits like '12139' etc
-def read_input_digit_grid(conv: Callable[[str], T]) -> numpy.typing.NDArray[T]:
-    ret = numpy.array(list(list(conv(i) for i in l) for l in read_input()))
-    ret.setflags(write=False)
-    return ret
-
-
 # single line of separated numbers
 def read_input_numbers(sep: str = ",") -> List[int]:
     l = read_input()
@@ -54,36 +48,42 @@ def read_input_numbers(sep: str = ",") -> List[int]:
     return [int(s) for s in l[0].split(sep)]
 
 
-NumericGrid = numpy.typing.NDArray[numpy.int_]
+if platform.python_implementation() == "CPython":
+    T = TypeVar("T", bound=numpy.generic)
 
+    # grid of densly packed digits like '12139' etc
+    def read_input_digit_grid(conv: Callable[[str], T]) -> numpy.typing.NDArray[T]:
+        ret = numpy.array(list(list(conv(i) for i in l) for l in read_input()))
+        ret.setflags(write=False)
+        return ret
 
-def most_common_byte(r: NumericGrid) -> int:
-    return int(numpy.sum(r == 1) >= numpy.sum(r == 0))
+    NumericGrid = numpy.typing.NDArray[numpy.int_]
 
+    def most_common_byte(r: NumericGrid) -> int:
+        return int(numpy.sum(r == 1) >= numpy.sum(r == 0))
 
-def neighbors(grid: NumericGrid, i: int, j: int) -> Iterable[Tuple[int, int]]:
-    h, w = grid.shape
-    for pos in ((i, j + 1), (i, j - 1), (i + 1, j), (i - 1, j)):
-        if pos[0] < 0 or pos[1] < 0 or pos[0] >= h or pos[1] >= w:
-            continue
-        yield pos
+    def neighbors(grid: NumericGrid, i: int, j: int) -> Iterable[Tuple[int, int]]:
+        h, w = grid.shape
+        for pos in ((i, j + 1), (i, j - 1), (i + 1, j), (i - 1, j)):
+            if pos[0] < 0 or pos[1] < 0 or pos[0] >= h or pos[1] >= w:
+                continue
+            yield pos
 
-
-def neighbors8(grid: NumericGrid, i: int, j: int) -> Iterable[Tuple[int, int]]:
-    h, w = grid.shape
-    for pos in (
-        (i, j + 1),
-        (i, j - 1),
-        (i + 1, j),
-        (i - 1, j),
-        (i + 1, j + 1),
-        (i - 1, j - 1),
-        (i + 1, j - 1),
-        (i - 1, j + 1),
-    ):
-        if pos[0] < 0 or pos[1] < 0 or pos[0] >= h or pos[1] >= w:
-            continue
-        yield pos
+    def neighbors8(grid: NumericGrid, i: int, j: int) -> Iterable[Tuple[int, int]]:
+        h, w = grid.shape
+        for pos in (
+            (i, j + 1),
+            (i, j - 1),
+            (i + 1, j),
+            (i - 1, j),
+            (i + 1, j + 1),
+            (i - 1, j - 1),
+            (i + 1, j - 1),
+            (i - 1, j + 1),
+        ):
+            if pos[0] < 0 or pos[1] < 0 or pos[0] >= h or pos[1] >= w:
+                continue
+            yield pos
 
 
 # Goofy replacement since cmp was removed in python3 (!)
