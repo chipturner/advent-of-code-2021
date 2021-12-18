@@ -1,3 +1,4 @@
+import copy
 import helpers
 
 import itertools
@@ -89,14 +90,11 @@ def add(v1, v2):
     return [ OPEN ] + v1 + v2 + [ CLOSE ]
 
 def chain(n):
-    print('chain!')
     acted = True
     while acted:
-        print('pre', render(n))
         acted, n = explode(n)
         if not acted:
             acted, n = split(n)
-        print('post', render(n))
     return n
 
 def nice_explode(f, expected):
@@ -130,51 +128,20 @@ def magnitude(f):
     l = repr(render(f))
     s = l.replace('[', 'm(').replace(']', ')')
     print(s)
+    eval(s)
     return eval(s)
 
 def main() -> None:
-    nice_explode([[[[[9,8],1],2],3],4],
-         [[[[0,9],2],3],4])
-
-    nice_explode([7,[6,[5,[4,[3,2]]]]],
-         [7,[6,[5,[7,0]]]])
-
-    nice_explode([[6,[5,[4,[3,2]]]],1],
-         [[6,[5,[7,0]]],3])
-
-    nice_explode([[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]],
-         [[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]])
-
-    nice_explode([[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]],
-         [[3,[2,[8,0]]],[9,[5,[7,0]]]])
-
-    nice_explode([[[[0, 7], 4], [[7, 8], [0, [6, 7]]]], [1, 1]],
-                 [[[[0,7],4],[[7,8],[6,0]]],[8,1]])
-
-    nice_split([10, 1], [[5, 5], 1])
-
-    a = add(parse('[[[[4,3],4],4],[7,[[8,4],9]]]'),
-            parse('[1,1]'))
-    print(render(a))
-    a = chain(a)
-    print(render(a))
-
-    print('gooooo')
     lines = helpers.read_input()
+    magnitudes = []
     fishes = []
     for f_str in lines:
         fishes.append(parse(f_str))
-    f = fishes.pop(0)
-    print(render(f))
-    while fishes:
-        print('add')
-        print('  ', render(f))
-        print('+ ', render(fishes[0]))
-        f = add(f, fishes.pop(0))
-        f = chain(f)
-        print('= ', render(f))
-        print(render(f))
-    print(render(f))
-
-    print(magnitude(f))
+    for i in range(len(fishes)):
+        for j in range(len(fishes)):
+            if i != j:
+                x = add(fishes[i], fishes[j])
+                x = chain(copy.deepcopy(x))
+                magnitudes.append(magnitude(x))
+    print(sorted(magnitudes))
 main()
