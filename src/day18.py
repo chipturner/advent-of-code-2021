@@ -36,14 +36,15 @@ class Node:
             n = n.left
         return n
 
-    def inorder(self):
+    def inorder(self, depth=0):
         if self.left:
-            for n in self.left.inorder():
+            for n in self.left.inorder(depth+1):
                 yield n
-            for n in self.right.inorder():
+            yield self, depth
+            for n in self.right.inorder(depth+1):
                 yield n
         if self.val is not None:
-            yield self
+            yield self, depth
     
 def parse(f):
     n = Node(None)
@@ -85,27 +86,20 @@ def leftmost_add(n, val):
 
 
 def explode(f):
-    todo = [(f, 0)]
-    exploded = False
-    while todo:
-        n, depth = todo.pop(0)
+    for n, depth in f.inorder():
         if depth >= 4 and n.is_pair():
-#            print('explode!', n.render())
             left, right = n.left.val, n.right.val
             n.left = n.right = None
             n.val = 0
             rightmost_add(n, right)
             leftmost_add(n, left)
             return True
-        if n.left:
-            todo.append((n.left, depth + 1))
-            todo.append((n.right, depth + 1))
     return False
 
 def split(n):
     ret = False
-    for n in n.inorder():
-        if n.val > 9:
+    for n, depth in n.inorder():
+        if n.val is not None and n.val > 9:
 #            print('split!', n.render())
             left = Node(n.val // 2)
             right = Node((n.val + 1) // 2)
