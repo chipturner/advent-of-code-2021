@@ -12,10 +12,12 @@ from typing import List, Tuple, Optional
 class Scanner:
     num: int
     points: List[Tuple[int, int, int]]
+    offset: Tuple[int, int, int]
     rotation: Optional[Tuple[int, int]] = None
     def __init__(self, num):
         self.num = int(num)
         self.points = []
+        self.offset = (0, 0, 0)
 
 def dist(p1, p2):
     return sum(abs(c1 - c2) for c1, c2 in zip(p1, p2))
@@ -28,14 +30,10 @@ def find_12(s1, s2):
         if len(xcs) < 11:
             continue
         for delta in xcs:
-#            print('delta', xd, delta)
-#            print('  ', s2.points)
             f2 = fixup(s2, delta)
-#            print('  ', f2.points)
             ix = set(s1.points).intersection(f2.points)
-#            print('ix', ix)
             if len(ix) >= 11:
-                return delta, len(ix)
+                return delta
         
 
 def rotate(s):
@@ -63,33 +61,13 @@ def rotate(s):
 def pt_diff(p1, p2):
     return (p1[0] - p2[0], p1[1] - p2[1], p1[2] - p2[2])
 
-def neg(pt):
-    return -pt[0], -pt[1], -pt[2]
-
-def fixup(s, pt):
+def fixup(s, offset):
     ret = Scanner(s.num)
-    ret.points = [ pt_diff(p, pt) for p in s.points ]
+    ret.points = [ pt_diff(p, offset) for p in s.points ]
     ret.rotation = s.rotation
+    ret.offset = offset
     return ret
     
-def find_path(g, a, b):
-    todo = [ (a, []) ]
-    while todo:
-        n, path = todo.pop(0)
-        if n == b:
-            return path + [ b ]
-        for p in g[n]:
-            todo.append((p, path + [ n ]))
-    return None
-
-def combine_path(path, links):
-    ret = [0,0,0]
-    for idx in range(len(path) - 1):
-        diff, _ = links[path[idx]][path[idx+1]]
-        for i in (0, 1, 2):
-            ret[i] += diff[i]
-    return tuple(ret)
-
 def main() -> None:
     lines = helpers.read_input()
     scanners = []
@@ -104,56 +82,47 @@ def main() -> None:
             cur_scan.points.append(tuple([int(v) for v in line.split(',')]))
     scanners.append(cur_scan)
 
-    links = collections.defaultdict(dict)
-    rotated = { s.num: s for s in scanners }
-
-    horizon = [ 0 ]
-    seen = set()
-    while horizon:
-        nxt = scanners[horizon.pop(0)]
-        seen.add(nxt.num)
-        print('springing from', nxt.num)
-        for other in scanners:
-            if other.num == nxt.num or other.num in seen:
-                continue
-            for candidate in rotate(other):
-                refs = find_12(nxt, candidate)
-                if refs:
-                    horizon.append(candidate.num)
-                    links[nxt.num][candidate.num] = (refs[0], candidate)
-                    scanners[candidate.num] = candidate
-                    print(f'link: {nxt.num} {candidate.num} rot{candidate.rotation} {refs}')
+    missing = set(s.num for s in scanners if s.num != 0)
+    anchored = { 0: scanners[0] }
+    while missing:
+        print(len(missing), 'missing nodes')
+        for floater_num in missing:
+            print('searching for path to', floater_num)
+            floater = scanners[floater_num]
+            updated = False
+            for rotated_floater in rotate(floater):
+                for candidate in anchored.values():
+                    offset = find_12(candidate, rotated_floater)
+                    if offset:
+                        missing.remove(floater.num)
+                        anchored_floater = fixup(rotated_floater, offset)
+                        anchored[floater.num] = anchored_floater
+                        print(f'anchored link: {candidate.num} -> {anchored_floater.num} rot{anchored_floater.rotation} {anchored_floater.offset}')
+                        updated = True
+                        break
+                if updated:
                     break
-    missing = []
-    for s in scanners[1:]:
-        if s.num not in links[0]:
-            missing.append((0, s.num))
-    print('missing', missing)
-
-    for m in missing:
-        path = find_path(links, m[0], m[1])
-        new_path = combine_path(path, links)
-        links[m[0]][m[1]] = new_path, None
+            if updated:
+                break
+    assert len(missing) == 0
+    scanners = None
 
     all_points = set()
-    all_points.update(scanners[0].points)
-    scanner_positions = dict()
-    for scanner in scanners[1:]:
-        from_id, to_id = scanners[0].num, scanner.num
+    all_points.update(anchored[0].points)
+    for scanner in anchored.values():
+        from_id, to_id = anchored[0].num, scanner.num
         if from_id == to_id:
             continue
-        delta, _ = links[from_id][to_id]
-        fixed = fixup(scanner, delta)
-        scanner_positions[scanner.num] = delta
-        print(f'fix for {from_id} to {to_id} is {delta}')
-        print(from_id, to_id, fixed.points)
+        fixed = anchored[to_id]
+        offset = fixed.offset
+        print(f'fix for {from_id} to {to_id} is {fixed.offset}')
         all_points.update(fixed.points)
     print(len(all_points))
 
     dists = []
-    for p1 in scanner_positions.values():
-        for p2 in scanner_positions.values():
-            dists.append(dist(p1, p2))
+    for p1 in anchored.values():
+        for p2 in anchored.values():
+            dists.append(dist(p1.offset, p2.offset))
     print(max(dists))
 
 main()
