@@ -18,7 +18,7 @@ class Scanner:
         self.points = []
 
 def dist(p1, p2):
-    return sum((c1 - c2) ** 2 for c1, c2 in zip(p1, p2))
+    return sum(abs(c1 - c2) for c1, c2 in zip(p1, p2))
 
 def find_12(s1, s2):
     xds = collections.defaultdict(list)
@@ -137,15 +137,23 @@ def main() -> None:
 
     all_points = set()
     all_points.update(scanners[0].points)
+    scanner_positions = dict()
     for scanner in scanners[1:]:
         from_id, to_id = scanners[0].num, scanner.num
         if from_id == to_id:
             continue
         delta, _ = links[from_id][to_id]
         fixed = fixup(scanner, delta)
+        scanner_positions[scanner.num] = delta
         print(f'fix for {from_id} to {to_id} is {delta}')
         print(from_id, to_id, fixed.points)
         all_points.update(fixed.points)
     print(len(all_points))
+
+    dists = []
+    for p1 in scanner_positions.values():
+        for p2 in scanner_positions.values():
+            dists.append(dist(p1, p2))
+    print(max(dists))
 
 main()
