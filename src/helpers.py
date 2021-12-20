@@ -85,6 +85,24 @@ if platform.python_implementation() == "CPython":
                 continue
             yield pos
 
+    def neighbors9_vals(grid: NumericGrid, i: int, j: int) -> int:
+        h, w = grid.shape
+        for pos in (
+                (i - 1, j - 1),
+                (i - 1, j),
+                (i - 1, j + 1),
+                (i, j - 1),
+                (i, j),
+                (i, j + 1),
+                (i + 1, j - 1),
+                (i + 1, j),
+                (i + 1, j + 1),
+        ):
+            if pos[0] < 0 or pos[1] < 0 or pos[0] >= h or pos[1] >= w:
+                yield 0
+            else:
+                yield grid[pos]
+
 
 # Goofy replacement since cmp was removed in python3 (!)
 def cmp(a: int, b: int) -> int:
