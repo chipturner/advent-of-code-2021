@@ -21,21 +21,23 @@ def main() -> None:
     for j in range(len(img_lines)):
         for i in range(len(img_lines[j])):
             img[(i, j)] = img_lines[i][j] == '#' and 1 or 0
-    pad_size = 30
-    for i in range(2):
-        print(img)
+    for i in range(25):
         shape = img.shape
-        padded_img = numpy.pad(img, 30)
+        padded_img = numpy.pad(img, 2)
         new_img = numpy.zeros((padded_img.shape[0], padded_img.shape[1]), dtype=int)
         for i in range(padded_img.shape[0]):
             for j in range(padded_img.shape[1]):
-                s = ''.join(str(v) for v in helpers.neighbors9_vals(padded_img, i, j))
+                sub_img = numpy.zeros((3, 3), dtype=int)
+                for delta_i in (-1, 0, 1):
+                    for delta_j in (-1, 0, 1):
+                        s = ''.join(str(v) for v in helpers.neighbors9_vals(padded_img, i + delta_i, j + delta_j))
+                        n = int(s, 2)
+                        sub_img[1 + delta_i, 1 + delta_j] = int(alg[n], 2)
+                s = ''.join(str(v) for v in helpers.neighbors9_vals(sub_img, 1, 1))
                 n = int(s, 2)
                 new_img[i, j] = int(alg[n], 2)
-        print(new_img)
         img = new_img
         print(numpy.sum(img == 1))
-    img = img[pad_size+1:-pad_size-1,pad_size+1:-pad_size-1]
     print(img)
     print(numpy.sum(img == 1))
     
