@@ -22,37 +22,12 @@ class Player:
 
 
 def main() -> None:
-    lines = helpers.read_input()
-    print(lines)
-
-    rng = zip(itertools.count(1, 1), itertools.cycle(range(1, 101)))
-    p1 = Player("p1", 4, 0)
-    p2 = Player("p2", 8, 0)
-    roll = []
-
-    while True:
-        combo = (p1.score, p2.score)
-        roll = list(itertools.islice(rng, 3))
-        print(p1)
-        p1 = p1.advance(sum(v[1] for v in roll))
-        print(p1)
-
-        if p1.score >= 1000:
-            break
-
-        combo = (p1.score, p2.score)
-        roll = list(itertools.islice(rng, 3))
-        p2 = p2.advance(sum(v[1] for v in roll))
-
-        if p2.score >= 1000:
-            break
-    print(roll)
-    print(combo, combo[0] * combo[1])
-    print(min(combo) * roll[-1][0])
-
-    p1 = Player("p1", 4, 0)
-    p2 = Player("p2", 10, 0)
-    print(play_until_21(p1, p2))
+    for p1_start in range(10):
+        for p2_start in range(10):
+            p1 = Player("p1", p1_start + 1, 0)
+            p2 = Player("p2", p2_start + 1, 0)
+            counts = play_until_21(p1, p2)
+            print(f'Start: {p1_start+1}, {p2_start+1} -> {counts} {counts[0]/(counts[0]+counts[1]):.2f}')
 
 
 @functools.cache
